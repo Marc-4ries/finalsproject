@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import CreateEvent from './components/CreateEvent';
-
+import './App.css';
+import CreateEvent from './Components/CreateEvents';
+import Contact from './Components/Contact';
+import HiddenWeb from './Components/HiddenWeb';
+import AdminDashboard from './Components/AdminDashboard';
 
 interface EventData {
   _id: string;
@@ -13,38 +16,60 @@ interface EventData {
   organizer: string;
   description: string;
 }
-
 const EventList = () => {
   const [events, setEvents] = useState<EventData[]>([]);
-
   useEffect(() => {
-    axios.get('http://localhost:5000/api/events')
-      .then(response => {
-        setEvents(response.data);
-      })
-      .catch(err => console.error("Could not fetch events", err));
+    fetchEvents();
   }, []);
-
+  const fetchEvents = async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:5000/api/events'
+      );
+      setEvents(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Community Events</h2>
+      <h1 className="text-center text-primary mb-5">
+        Community Event Manager
+      </h1>
       <div className="row">
         {events.length === 0 ? (
           <div className="col-12">
-            <p className="alert alert-info">No events yet! Use the "Add New Event" tab to create one.</p>
+            <div className="alert alert-info">
+              No Events Available
+            </div>
           </div>
         ) : (
-          events.map(event => (
-            <div key={event._id} className="col-md-4 mb-4">
-              <div className="card h-100 shadow-sm">
+          events.map((event) => (
+            <div
+              key={event._id}
+              className="col-md-4 mb-4"
+            >
+              <div className="card shadow-lg border-0 h-100">
                 <div className="card-body">
-                  <h5 className="card-title text-primary">{event.eventName}</h5>
-                  <p className="card-text"><strong> Location:</strong> {event.location}</p>
-                  <p className="card-text"><strong> Date:</strong> {event.date}</p>
-                  <p className="card-text">{event.description}</p>
+                  <h4 className="text-primary">
+                    {event.eventName}
+                  </h4>
+                  <p>
+                    <strong>Location:</strong>{" "}
+                    {event.location}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {event.date}
+                  </p>
+                  <p>
+                    {event.description}
+                  </p>
                 </div>
-                <div className="card-footer bg-transparent border-top-0">
-                  <small className="text-muted">Organized by {event.organizer}</small>
+                <div className="card-footer">
+                  <small>
+                    Organized by {event.organizer}
+                  </small>
                 </div>
               </div>
             </div>
@@ -54,23 +79,74 @@ const EventList = () => {
     </div>
   );
 };
-
 function App() {
   return (
     <Router>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container">
-          <Link className="navbar-brand" to="/">Event Manager</Link>
+          <Link
+            className="navbar-brand fw-bold"
+            to="/"
+          >
+            Event Manager
+          </Link>
           <div className="navbar-nav">
-            <Link className="nav-link" to="/">View Events</Link>
-            <Link className="nav-link" to="/create">Add New Event</Link>
+            <Link
+              className="nav-link"
+              to="/"
+            >
+              EventList
+            </Link>
+            <Link
+              className="nav-link"
+              to="/create"
+            >
+              Create Event
+            </Link>
+
+            <Link
+              className="nav-link"
+              to="/contact"
+            >
+              Contact
+            </Link>
+            <Link
+              className="nav-link"
+              to="/hiddenweb"
+            >
+              HiddenWeb
+            </Link>
+
+            <Link
+              className="nav-link"
+              to="/admin"
+            >
+              AdminDashboard
+            </Link>
           </div>
         </div>
       </nav>
-
       <Routes>
-        <Route path="/" element={<EventList />} />
-        <Route path="/create" element={<CreateEvent />} />
+        <Route
+          path="/"
+          element={<EventList />}
+        />
+        <Route
+          path="/create"
+          element={<CreateEvent />}
+        />
+        <Route
+          path="/contact"
+          element={<Contact />}
+        />
+        <Route
+          path="/hiddenweb"
+          element={<HiddenWeb />}
+        />
+        <Route
+          path="/admin"
+          element={<AdminDashboard />}
+        />
       </Routes>
     </Router>
   );
